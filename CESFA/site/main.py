@@ -10,7 +10,7 @@ from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
  
-from database import Base, engine
+from database import Base, engine, SessionLocal, get_db
 Base.metadata.create_all(bind=engine)
 from models import Usuario, Aluno, Turma, Disciplina, Nota, Frequencia, Livro 
 # --- Config ---
