@@ -10,7 +10,8 @@ from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
  
-from database import Base, engine, get_db, SessionLocal
+from database import Base, engine
+Base.metadata.create_all(bind=engine)
 from models import Usuario, Aluno, Turma, Disciplina, Nota, Frequencia, Livro 
 # --- Config ---
 SECRET_KEY = "cesfa-secret-key-2024-mude-em-producao"
