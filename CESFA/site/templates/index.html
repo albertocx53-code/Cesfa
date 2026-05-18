@@ -645,6 +645,99 @@ background-position:center;
       .btn-login { display: none; }
       .typing-cursor { height: 30px; }
     }
+    
+    /* =========================
+   MOBILE EXTRA
+========================= */
+
+@media (max-width: 768px) {
+
+  body {
+    overflow-x: hidden;
+  }
+
+  .hero {
+    padding: 120px 20px 80px;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .hero h1 {
+    font-size: 2.2rem;
+    line-height: 1.2;
+  }
+
+  .hero p {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .hero-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-hero {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .hero-stats {
+    position: relative;
+    bottom: auto;
+    margin-top: 50px;
+    flex-wrap: wrap;
+    gap: 25px;
+  }
+
+  .about-image {
+    height: 260px;
+  }
+
+  .about-features {
+    grid-template-columns: 1fr;
+  }
+
+  .service-card {
+    padding: 25px;
+  }
+
+  .service-card img {
+    height: 200px;
+  }
+
+  .timeline-content {
+    padding: 20px;
+  }
+
+  .timeline-bg-2008,
+  .timeline-bg-2012,
+  .timeline-bg-2018,
+  .timeline-bg-2024 {
+    min-height: 300px;
+  }
+
+  .contact-container {
+    gap: 30px;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    font-size: 16px;
+  }
+
+  .footer-bottom-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .scroll-top {
+    right: 15px;
+    bottom: 15px;
+  }
+
+}
   </style>
 </head>
 <body>
