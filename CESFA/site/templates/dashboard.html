@@ -1,0 +1,782 @@
+{% extends "base_panel.html" %}
+
+{% block title %}
+Dashboard - CESFA
+{% endblock %}
+
+{% block nav_dashboard %}
+active
+{% endblock %}
+
+
+
+{% block extra_css %}
+<style>
+
+.welcome-banner{
+    background:linear-gradient(135deg,#1a1a2e,#0f3460);
+    border-radius:24px;
+    padding:32px;
+    color:white;
+    margin-bottom:25px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.quick-actions{
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.quick-action{
+    background:white;
+    padding:14px 22px;
+    border-radius:14px;
+    text-decoration:none;
+    color:#333;
+    border:1px solid #eee;
+    transition:.3s;
+    font-weight:600;
+}
+
+.quick-action:hover{
+    transform:translateY(-3px);
+    border-color:#2563eb;
+    color:#2563eb;
+}
+
+.stat-cards{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.stat-card{
+    background:white;
+    padding:24px;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+    position:relative;
+    overflow:hidden;
+}
+
+.stat-card::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    width:5px;
+    height:100%;
+}
+
+.stat-card:nth-child(1)::before{
+    background:#2563eb;
+}
+
+.stat-card:nth-child(2)::before{
+    background:#9333ea;
+}
+
+.stat-card:nth-child(3)::before{
+    background:#059669;
+}
+
+.stat-card:nth-child(4)::before{
+    background:#ea580c;
+}
+
+.stat-title{
+    color:#64748b;
+    font-size:14px;
+    margin-bottom:10px;
+}
+
+.stat-value{
+    font-size:34px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.chart-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.chart-card{
+    background:white;
+    padding:24px;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+}
+
+.chart-card h3{
+    margin-bottom:20px;
+    color:#0f172a;
+}
+
+.table-card{
+    background:white;
+    padding:24px;
+    border-radius:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,.05);
+}
+
+.table-card h3{
+    margin-bottom:20px;
+}
+
+.dashboard-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.dashboard-table th{
+    background:#0f172a;
+    color:white;
+    padding:16px;
+    text-align:left;
+}
+
+.dashboard-table td{
+    padding:16px;
+    border-bottom:1px solid #eee;
+}
+
+.dashboard-table tr:hover{
+    background:#f8fafc;
+}
+
+.badge{
+    padding:8px 14px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+}
+
+.badge-success{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.badge-warning{
+    background:#fef3c7;
+    color:#92400e;
+}
+
+.badge-danger{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+@media(max-width:1000px){
+
+    .stat-cards{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .chart-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+
+    .stat-cards{
+        grid-template-columns:1fr;
+    }
+
+    .welcome-banner{
+        flex-direction:column;
+        text-align:center;
+        gap:20px;
+    }
+}
+
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+
+<div class="welcome-banner">
+
+    <div>
+
+        <h1>
+            Bem-vindo,
+            {{ user.nome if user else 'Administrador' }}!
+        </h1>
+
+        <p>
+            Painel acadêmico CESFA
+        </p>
+
+    </div>
+
+    <div>
+
+        <h2 id="liveTime">
+            00:00
+        </h2>
+
+        <p id="liveDate">
+            Carregando...
+        </p>
+
+    </div>
+
+</div>
+
+
+
+<!-- AÇÕES -->
+
+<div class="quick-actions">
+
+    <a href="/alunos" class="quick-action">
+        Novo Aluno
+    </a>
+
+    <a href="/notas" class="quick-action">
+        Lançar Notas
+    </a>
+
+    <a href="/boletim" class="quick-action">
+        Boletim Escolar
+    </a>
+
+</div>
+
+
+
+<!-- CARDS -->
+
+<div class="stat-cards">
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Total de Alunos
+        </div>
+
+        <div
+            class="stat-value"
+            id="totalAlunos"
+        >
+            0
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Total de Turmas
+        </div>
+
+        <div
+            class="stat-value"
+            id="totalTurmas"
+        >
+            0
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Média Geral
+        </div>
+
+        <div
+            class="stat-value"
+            id="mediaGeral"
+        >
+            0
+        </div>
+
+    </div>
+
+
+
+    <div class="stat-card">
+
+        <div class="stat-title">
+            Frequência
+        </div>
+
+        <div
+            class="stat-value"
+            id="frequencia"
+        >
+            0%
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- GRÁFICOS -->
+
+<div class="chart-grid">
+
+    <div class="chart-card">
+
+        <h3>
+            Notas por Disciplina
+        </h3>
+
+        <canvas id="chartDisciplinas"></canvas>
+
+    </div>
+
+
+
+    <div class="chart-card">
+
+        <h3>
+            Aprovados x Reprovados
+        </h3>
+
+        <canvas id="chartAprovados"></canvas>
+
+    </div>
+
+</div>
+
+
+
+<!-- TABELA -->
+
+<div class="table-card">
+
+    <h3>
+        Últimas Notas Lançadas
+    </h3>
+
+    <table class="dashboard-table">
+
+        <thead>
+
+            <tr>
+
+                <th>Aluno</th>
+                <th>Disciplina</th>
+                <th>Bimestre</th>
+                <th>Nota</th>
+                <th>Situação</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody id="dashboardTableBody">
+
+            <tr>
+
+                <td colspan="5">
+                    Carregando...
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% endblock %}
+
+
+
+{% block extra_js %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+
+
+// =========================
+// RELÓGIO
+// =========================
+
+function updateClock(){
+
+    const now =
+        new Date();
+
+    document.getElementById(
+        'liveTime'
+    ).innerHTML =
+
+        now.getHours()
+        .toString()
+        .padStart(2,'0')
+
+        + ':'
+
+        +
+
+        now.getMinutes()
+        .toString()
+        .padStart(2,'0');
+
+
+
+    document.getElementById(
+        'liveDate'
+    ).innerHTML =
+
+        now.toLocaleDateString(
+            'pt-BR'
+        );
+}
+
+updateClock();
+
+setInterval(updateClock,30000);
+
+
+
+// =========================
+// DASHBOARD
+// =========================
+
+async function loadDashboard(){
+
+    try{
+
+        // =====================
+        // ALUNOS
+        // =====================
+
+        const alunosRes =
+            await fetch('/api/alunos');
+
+        const alunos =
+            await alunosRes.json();
+
+
+
+        // =====================
+        // TURMAS
+        // =====================
+
+        const turmasRes =
+            await fetch('/api/turmas');
+
+        const turmas =
+            await turmasRes.json();
+
+
+
+        // =====================
+        // NOTAS
+        // =====================
+
+        const notasRes =
+            await fetch('/api/notas');
+
+        const notas =
+            await notasRes.json();
+
+
+
+        // =====================
+        // TOTAL ALUNOS
+        // =====================
+
+        document.getElementById(
+            'totalAlunos'
+        ).innerHTML =
+            alunos.length;
+
+
+
+        // =====================
+        // TOTAL TURMAS
+        // =====================
+
+        document.getElementById(
+            'totalTurmas'
+        ).innerHTML =
+            turmas.length;
+
+
+
+        // =====================
+        // MÉDIA GERAL
+        // =====================
+
+        let somaNotas = 0;
+
+        notas.forEach(n => {
+            somaNotas += n.valor;
+        });
+
+        const media =
+            notas.length > 0
+            ? (somaNotas / notas.length).toFixed(1)
+            : 0;
+
+        document.getElementById(
+            'mediaGeral'
+        ).innerHTML =
+            media;
+
+
+
+        // =====================
+        // FREQUÊNCIA
+        // =====================
+
+        document.getElementById(
+            'frequencia'
+        ).innerHTML =
+            '95%';
+
+
+
+        // =====================
+        // APROVADOS
+        // =====================
+
+        let aprovados = 0;
+        let reprovados = 0;
+
+        notas.forEach(n => {
+
+            if(n.valor >= 7){
+
+                aprovados++;
+
+            }else{
+
+                reprovados++;
+            }
+        });
+
+
+
+        // =====================
+        // CHART DISCIPLINAS
+        // =====================
+
+        const disciplinasMap = {};
+
+        notas.forEach(n => {
+
+            if(!disciplinasMap[n.disciplina]){
+
+                disciplinasMap[n.disciplina] = [];
+            }
+
+            disciplinasMap[n.disciplina]
+            .push(n.valor);
+        });
+
+
+
+        const disciplinas =
+            Object.keys(disciplinasMap);
+
+        const medias =
+            disciplinas.map(d => {
+
+                const arr =
+                    disciplinasMap[d];
+
+                const total =
+                    arr.reduce((a,b)=>a+b,0);
+
+                return (
+                    total / arr.length
+                ).toFixed(1);
+            });
+
+
+
+        new Chart(
+
+            document.getElementById(
+                'chartDisciplinas'
+            ),
+
+            {
+
+                type:'bar',
+
+                data:{
+
+                    labels:disciplinas,
+
+                    datasets:[{
+
+                        label:'Média',
+
+                        data:medias,
+
+                        borderWidth:1
+
+                    }]
+                }
+            }
+        );
+
+
+
+        // =====================
+        // CHART APROVADOS
+        // =====================
+
+        new Chart(
+
+            document.getElementById(
+                'chartAprovados'
+            ),
+
+            {
+
+                type:'doughnut',
+
+                data:{
+
+                    labels:[
+                        'Aprovados',
+                        'Reprovados'
+                    ],
+
+                    datasets:[{
+
+                        data:[
+                            aprovados,
+                            reprovados
+                        ]
+
+                    }]
+                }
+            }
+        );
+
+
+
+        // =====================
+        // TABELA
+        // =====================
+
+        const tbody =
+            document.getElementById(
+                'dashboardTableBody'
+            );
+
+
+
+        if(notas.length === 0){
+
+            tbody.innerHTML = `
+
+            <tr>
+
+                <td colspan="5">
+                    Nenhuma nota encontrada
+                </td>
+
+            </tr>
+            `;
+
+            return;
+        }
+
+
+
+        tbody.innerHTML =
+            notas.slice(0,10).map(n => {
+
+                let sit =
+                    'Aprovado';
+
+                let badge =
+                    'badge-success';
+
+                if(n.valor < 7){
+
+                    sit =
+                        'Recuperação';
+
+                    badge =
+                        'badge-warning';
+                }
+
+                if(n.valor < 5){
+
+                    sit =
+                        'Reprovado';
+
+                    badge =
+                        'badge-danger';
+                }
+
+                return `
+
+                <tr>
+
+                    <td>
+                        ${n.aluno}
+                    </td>
+
+                    <td>
+                        ${n.disciplina}
+                    </td>
+
+                    <td>
+                        ${n.bimestre}º
+                    </td>
+
+                    <td>
+                        ${n.valor}
+                    </td>
+
+                    <td>
+
+                        <span class="badge ${badge}">
+                            ${sit}
+                        </span>
+
+                    </td>
+
+                </tr>
+                `;
+
+            }).join('');
+
+    }catch(err){
+
+        console.log(err);
+    }
+}
+
+
+
+loadDashboard();
+
+</script>
+{% endblock %}

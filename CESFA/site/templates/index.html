@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CESFA - Centro Educacional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; color: #333; background: #fff; overflow-x: hidden; }
+    html { scroll-behavior: smooth; }
+
+    /* PRELOADER */
+    .preloader {
+      position: fixed; inset: 0; background: #1a1a2e; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.6s, visibility 0.6s;
+    }
+    .preloader.hidden { opacity: 0; visibility: hidden; }
+    .preloader-inner { text-align: center; color: white; }
+    .preloader-logo { font-size: 40px; color: #e53935; animation: pulse 1.2s infinite; margin-bottom: 16px; }
+    .preloader-bar { width: 200px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+    .preloader-bar::after { content: ""; display: block; width: 40%; height: 100%; background: #e53935; border-radius: 3px; animation: loading 1s ease-in-out infinite; }
+    @keyframes loading { 0% { transform: translateX(-100%); } 100% { transform: translateX(350%); } }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+    /* HEADER */
+    header {
+      position: fixed; width: 100%; top: 0; left: 0;
+      padding: 18px 50px; display: flex; justify-content: space-between;
+      align-items: center; transition: all 0.4s ease; z-index: 1000;
+    }
+    header.transparent { background: transparent; }
+    header.scrolled {
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+    }
+    header.scrolled .nav-link { color: #333; }
+    header.transparent .nav-link { color: rgba(255,255,255,0.85); }
+    header.transparent .nav-link:hover { color: white; background: rgba(255,255,255,0.1); }
+    .logo { font-weight: 700; font-size: 22px; color: #e53935; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .logo i { font-size: 26px; }
+    nav { display: flex; align-items: center; gap: 8px; }
+    .nav-link {
+      text-decoration: none; font-weight: 500; padding: 8px 16px;
+      border-radius: 8px; transition: 0.3s; position: relative; font-size: 15px;
+    }
+    .nav-link.active { color: #e53935 !important; }
+    .nav-link::after {
+      content: ""; position: absolute; width: 0%; height: 2px;
+      background: #e53935; left: 16px; bottom: 2px; transition: 0.3s;
+    }
+    .nav-link:hover::after, .nav-link.active::after { width: calc(100% - 32px); }
+    .btn-login {
+      background: #e53935; color: white; padding: 10px 24px; border-radius: 10px;
+      text-decoration: none; font-weight: 600; font-size: 14px; margin-left: 12px;
+      transition: 0.3s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-login:hover { background: #c62828; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(229,57,53,0.3); }
+    .menu-toggle { display: none; font-size: 28px; cursor: pointer; background: none; border: none; color: white; }
+    header.scrolled .menu-toggle { color: #333; }
+
+    /* HERO */
+    .hero {
+      height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+      background:
+linear-gradient(
+rgba(15,23,42,.85),
+rgba(15,23,42,.85)
+),
+url('https://scontent-for2-1.xx.fbcdn.net/v/t39.30808-6/309378896_217098850640696_8752125578074069070_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=olqarJ9fwSEQ7kNvwHhvQB8&_nc_oc=AdoIgLTetVxtuY74Mu0rkQNEuaHd2qylJ2TZSIBSI0lCuY7ayUPD0dEXGEAAxhcJ4nE&_nc_zt=23&_nc_ht=scontent-for2-1.xx&_nc_gid=KpsSK4-5kDp3uEY-UkI73g&_nc_ss=7b2a8&oh=00_Af5RYwrs7rb2YHiwbll4KhLgQkInyyBFNiVX2q942yo5vQ&oe=6A086FDF');
+
+background-size:cover;
+background-position:center;
+    }
+    .hero-bg::before {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(circle at 30% 50%, rgba(229,57,53,0.15) 0%, transparent 60%),
+                  radial-gradient(circle at 70% 30%, rgba(255,138,101,0.1) 0%, transparent 50%);
+    }
+    .hero-particles { position: absolute; inset: 0; overflow: hidden; }
+    .particle {
+      position: absolute; width: 4px; height: 4px; background: rgba(255,255,255,0.15);
+      border-radius: 50%; animation: float linear infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-10vh) rotate(720deg); opacity: 0; }
+    }
+    .hero-content { position: relative; max-width: 800px; padding: 20px; color: white; }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+      padding: 8px 20px; border-radius: 30px; font-size: 14px;
+      margin-bottom: 28px; backdrop-filter: blur(10px);
+    }
+    .badge i { color: #ff8a65; }
+    .hero h1 { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 700; margin-bottom: 24px; line-height: 1.15; }
+    .hero h1 span { color: #ff8a65; }
+    .typing-cursor { display: inline-block; width: 3px; height: 50px; background: #ff8a65; margin-left: 4px; animation: blink 0.8s infinite; vertical-align: text-bottom; }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+    .hero p { font-size: 19px; opacity: 0.85; margin-bottom: 40px; line-height: 1.7; max-width: 650px; margin-left: auto; margin-right: auto; }
+    .hero-buttons { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .btn-hero {
+      padding: 14px 32px; border-radius: 12px; text-decoration: none;
+      font-weight: 600; font-size: 16px; transition: all 0.3s; display: inline-flex;
+      align-items: center; gap: 10px;
+    }
+    .btn-primary { background: #e53935; color: white; }
+    .btn-primary:hover { background: #c62828; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(229,57,53,0.3); }
+    .btn-outline { border: 2px solid rgba(255,255,255,0.3); color: white; }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.5); }
+    .hero-stats {
+      position: absolute; bottom: 40px; left: 0; right: 0;
+      display: flex; justify-content: center; gap: 60px; color: white;
+    }
+    .stat { text-align: center; }
+    .stat h2 { font-size: 36px; font-weight: 700; }
+    .stat p { font-size: 14px; opacity: 0.7; margin-top: 4px; }
+    .scroll-indicator {
+      position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+      color: rgba(255,255,255,0.4); animation: scrollBounce 2s infinite; cursor: pointer;
+    }
+    @keyframes scrollBounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(10px); } }
+
+    /* SECTIONS */
+    section { padding: 100px 50px; }
+    .section-title { text-align: center; margin-bottom: 60px; }
+    .section-title h2 { font-family: 'Playfair Display', serif; font-size: 40px; margin-bottom: 16px; }
+    .section-title p { color: #666; font-size: 18px; max-width: 600px; margin: 0 auto; }
+    .section-title .line { width: 60px; height: 4px; background: #e53935; border-radius: 2px; margin: 20px auto 0; }
+
+    /* ABOUT */
+    #sobre { background: #fafafa; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 1100px; margin: 0 auto; align-items: center; }
+    .about-image {
+      width: 100%; height: 400px; border-radius: 20px; overflow: hidden;
+      background: linear-gradient(135deg, #e53935, #ff8a65);
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .about-image i { font-size: 120px; color: rgba(255,255,255,0.3); }
+    .about-text h3 { font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 20px; }
+    .about-text p { color: #555; line-height: 1.8; margin-bottom: 16px; font-size: 16px; }
+    .about-features { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 30px; }
+    .feature-item {
+      display: flex; align-items: center; gap: 12px; padding: 14px;
+      background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      transition: 0.3s; cursor: default;
+    }
+    .feature-item:hover { transform: translateX(6px); box-shadow: 0 4px 20px rgba(229,57,53,0.1); }
+    .feature-item i { color: #e53935; font-size: 20px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: rgba(229,57,53,0.08); border-radius: 10px; flex-shrink: 0; transition: 0.3s; }
+    .feature-item:hover i { background: #e53935; color: white; }
+    .feature-item span { font-weight: 500; font-size: 14px; }
+
+    /* PROGRESS NUMBERS */
+    .progress-section { background: linear-gradient(135deg, #1a1a2e, #0f3460); color: white; padding: 80px 50px; }
+    .progress-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1100px; margin: 0 auto; text-align: center; }
+    .progress-item { padding: 30px; }
+    .progress-circle {
+      width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .progress-circle svg { position: absolute; width: 100%; height: 100%; transform: rotate(-90deg); }
+    .progress-circle svg circle { fill: none; stroke-width: 4; }
+    .progress-circle svg circle.bg { stroke: rgba(255,255,255,0.1); }
+    .progress-circle svg circle.fg { stroke: #e53935; stroke-dasharray: 339.292; stroke-dashoffset: 339.292; stroke-linecap: round; transition: stroke-dashoffset 2s ease; }
+    .progress-number { font-size: 32px; font-weight: 700; position: relative; z-index: 1; }
+    .progress-label { font-size: 15px; opacity: 0.8; }
+
+    /* SERVICES */
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; max-width: 1100px; margin: 0 auto; }
+    .service-card {
+      background: white; border-radius: 20px; padding: 40px 30px; text-align: center;
+      box-shadow: 0 5px 30px rgba(0,0,0,0.05); transition: all 0.4s; border: 1px solid #f0f0f0;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+      background: linear-gradient(90deg, #e53935, #ff8a65); transform: scaleX(0);
+      transform-origin: left; transition: transform 0.4s;
+    }
+    .service-card:hover::before { transform: scaleX(1); }
+    .service-card:hover { transform: translateY(-8px); box-shadow: 0 20px 50px rgba(0,0,0,0.12); }
+    .service-icon {
+      width: 70px; height: 70px; border-radius: 18px; display: flex;
+      align-items: center; justify-content: center; margin: 0 auto 24px;
+      font-size: 28px; color: white; transition: 0.4s;
+    }
+    .service-card:hover .service-icon { transform: rotateY(180deg); }
+    .service-card h3 { font-size: 20px; margin-bottom: 12px; }
+    .service-card p { color: #666; font-size: 15px; line-height: 1.7; }
+
+    /* TIMELINE */
+    .timeline-section { padding: 100px 50px; }
+    .timeline { max-width: 800px; margin: 0 auto; position: relative; }
+    .timeline::before {
+      content: ""; position: absolute; left: 50%; top: 0; bottom: 0;
+      width: 3px; background: linear-gradient(to bottom, #e53935, #ff8a65);
+      transform: translateX(-50%);
+    }
+    .timeline-item {
+      display: flex; margin-bottom: 50px; position: relative;
+    }
+    .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+    .timeline-content {
+      width: 45%; padding: 24px; background: white; border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.06); transition: 0.3s; border: 1px solid #f0f0f0;
+    }
+    .timeline-content:hover { transform: translateY(-4px); box-shadow: 0 12px 35px rgba(0,0,0,0.1); }
+    .timeline-dot {
+      position: absolute; left: 50%; top: 30px; width: 16px; height: 16px;
+      background: #e53935; border-radius: 50%; transform: translateX(-50%);
+      border: 3px solid white; box-shadow: 0 0 0 3px #e53935; z-index: 1;
+    }
+    .timeline-year { color: #e53935; font-weight: 700; font-size: 14px; margin-bottom: 8px; }
+    .timeline-content h3 { font-size: 18px; margin-bottom: 8px; }
+    .timeline-content p { color: #666; font-size: 14px; line-height: 1.6; }
+
+     /* BACKGROUNDS */
+
+    .timeline-bg-2008 {
+    background-image: url('https://scontent-for2-1.xx.fbcdn.net/v/t39.30808-6/309378896_217098850640696_8752125578074069070_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=olqarJ9fwSEQ7kNvwHhvQB8&_nc_oc=AdoIgLTetVxtuY74Mu0rkQNEuaHd2qylJ2TZSIBSI0lCuY7ayUPD0dEXGEAAxhcJ4nE&_nc_zt=23&_nc_ht=scontent-for2-1.xx&_nc_gid=ElA0XCZjeH7tCZNTmOjgVQ&_nc_ss=7b2a8&oh=00_Af6ONxlA5KhQTzB4yQTDVMq27p9U49KkBXx94awbWGoL0w&oe=6A08379F');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative; /* Importante para o overlay funcionar */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Garante que o texto fique bem posicionado */
+    min-height: 250px;
+}
+
+/* Criando a película escura (Overlay) */
+.timeline-bg-2008::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Escurece 50% da imagem */
+    z-index: 1;
+}
+
+/* Fazendo o texto aparecer na frente da película */
+.timeline-bg-2008 h3,
+.timeline-bg-2008 p,
+.timeline-bg-2008 .timeline-year {
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-bg-2008 h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.timeline-bg-2008 p {
+    color: #f5f5f5;
+    line-height: 1.4;
+}
+
+.timeline-bg-2012 {
+    background-image: url('https://scontent-for2-2.xx.fbcdn.net/v/t39.30808-6/503857396_3082701335233805_890263226705093345_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=7b2446&_nc_ohc=DHqoNTrSU0gQ7kNvwHExMd1&_nc_oc=AdooktQ7x1ArOTpY9G9faX8UHz6tU9JtVdgib8-l1H2foCV0wxMapnvusq91wd9iMxU&_nc_zt=23&_nc_ht=scontent-for2-2.xx&_nc_gid=NDIVdjH4Sqlv5J5yoFVvjg&_nc_ss=7b2a8&oh=00_Af5gyrlzqwzVKeeI1nhXKX8WjZHIqMM0-mwZ8RDH1spctQ&oe=6A0862BF');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative; /* Importante para o overlay funcionar */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Garante que o texto fique bem posicionado */
+    min-height: 250px;
+}
+
+/* Criando a película escura (Overlay) */
+.timeline-bg-2012::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Escurece 50% da imagem */
+    z-index: 1;
+}
+
+/* Fazendo o texto aparecer na frente da película */
+.timeline-bg-2012 h3,
+.timeline-bg-2012 p,
+.timeline-bg-2012 .timeline-year {
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-bg-2012 h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.timeline-bg-2012 p {
+    color: #f5f5f5;
+    line-height: 1.4;
+}
+
+.timeline-bg-2018 {
+    background-image: url('https://scontent-for2-2.xx.fbcdn.net/v/t39.30808-6/503181940_3082701395233799_6998759504273511559_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7b2446&_nc_ohc=iQzH4EkzQVcQ7kNvwEBLxSR&_nc_oc=Adoz6hlyXe6CxCWkaqLc-tILVBwO1Jj4C2CpAc7dyXzXd31MVT8NhUvk3u3FJqg4I_A&_nc_zt=23&_nc_ht=scontent-for2-2.xx&_nc_gid=y0b8gihXn4JI_SXb-40ymA&_nc_ss=7b2a8&oh=00_Af6czGBAm_OX1WZLyeG2HS_IK8QE4lLNiBu7qXG3G3tQiA&oe=6A084821');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative; /* Importante para o overlay funcionar */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Garante que o texto fique bem posicionado */
+    min-height: 250px;
+}
+
+/* Criando a película escura (Overlay) */
+.timeline-bg-2018::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Escurece 50% da imagem */
+    z-index: 1;
+}
+
+/* Fazendo o texto aparecer na frente da película */
+.timeline-bg-2018 h3,
+.timeline-bg-2018 p,
+.timeline-bg-2018 .timeline-year {
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-bg-2018 h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.timeline-bg-2018 p {
+    color: #f5f5f5;
+    line-height: 1.4;
+}
+
+.timeline-bg-2024 {
+    background-image: url('https://i.pinimg.com/736x/fa/e1/ce/fae1ce648eaef1ed552a3f0978901e4c.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 30px;
+    border-radius: 20px;
+    position: relative; /* Importante para o overlay funcionar */
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end; /* Garante que o texto fique bem posicionado */
+    min-height: 250px;
+}
+
+/* Criando a película escura (Overlay) */
+.timeline-bg-2024::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Escurece 50% da imagem */
+    z-index: 1;
+}
+
+/* Fazendo o texto aparecer na frente da película */
+.timeline-bg-2024 h3,
+.timeline-bg-2024 p,
+.timeline-bg-2024 .timeline-year {
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-bg-2024 h3 {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.timeline-bg-2024 p {
+    color: #f5f5f5;
+    line-height: 1.4;
+}
+
+    /* TESTIMONIALS */
+    .testimonials-section { background: #fafafa; padding: 100px 50px; }
+    .testimonial-slider { max-width: 800px; margin: 0 auto; position: relative; overflow: hidden; }
+    .testimonial-track { display: flex; transition: transform 0.5s ease; }
+    .testimonial-card {
+      min-width: 100%; padding: 40px; text-align: center;
+    }
+    .testimonial-card .stars { color: #ffb300; font-size: 20px; margin-bottom: 20px; }
+    .testimonial-card blockquote {
+      font-size: 18px; line-height: 1.8; color: #555; font-style: italic;
+      margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto;
+    }
+    .testimonial-card blockquote::before { content: "\201C"; font-size: 60px; color: #e53935; display: block; line-height: 1; margin-bottom: -10px; }
+    .testimonial-author { display: flex; align-items: center; justify-content: center; gap: 14px; }
+    .testimonial-avatar {
+      width: 50px; height: 50px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 18px; color: white;
+    }
+    .testimonial-name h4 { font-size: 16px; }
+    .testimonial-name p { color: #888; font-size: 13px; }
+    .slider-controls { display: flex; justify-content: center; gap: 16px; margin-top: 30px; }
+    .slider-btn {
+      width: 44px; height: 44px; border-radius: 50%; border: 2px solid #ddd;
+      background: white; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; transition: 0.3s; font-size: 16px; color: #666;
+    }
+    .slider-btn:hover { border-color: #e53935; color: #e53935; }
+    .slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 20px; }
+    .slider-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #ddd;
+      cursor: pointer; transition: 0.3s;
+    }
+    .slider-dot.active { background: #e53935; width: 30px; border-radius: 5px; }
+
+    /* TEAM */
+    #equipe { background: #fff; }
+    .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; max-width: 1100px; margin: 0 auto; }
+    .team-card {
+      background: white; border-radius: 20px; overflow: hidden;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.05); transition: 0.4s; text-align: center;
+      position: relative;
+    }
+    .team-card:hover { transform: translateY(-8px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+    .team-avatar {
+      width: 100%; height: 220px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .team-avatar i { font-size: 60px; color: rgba(255,255,255,0.5); transition: 0.4s; }
+    .team-card:hover .team-avatar i { transform: scale(1.2); }
+    .team-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      opacity: 0; transition: 0.4s;
+    }
+    .team-card:hover .team-overlay { opacity: 1; }
+    .team-social {
+      width: 40px; height: 40px; border-radius: 50%; background: white;
+      display: flex; align-items: center; justify-content: center;
+      text-decoration: none; color: #333; transition: 0.3s; transform: translateY(20px);
+    }
+    .team-card:hover .team-social { transform: translateY(0); }
+    .team-social:hover { background: #e53935; color: white; }
+    .team-info { padding: 24px; }
+    .team-info h3 { font-size: 18px; margin-bottom: 4px; }
+    .team-info p { color: #888; font-size: 14px; }
+
+    /* FAQ */
+    .faq-section { padding: 100px 50px; }
+    .faq-container { max-width: 700px; margin: 0 auto; }
+    .faq-item {
+      margin-bottom: 12px; border: 1px solid #eee; border-radius: 14px;
+      overflow: hidden; transition: 0.3s;
+    }
+    .faq-item.active { border-color: #e53935; box-shadow: 0 4px 20px rgba(229,57,53,0.08); }
+    .faq-question {
+      padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer; font-weight: 600; font-size: 15px; transition: 0.3s; background: white;
+    }
+    .faq-question:hover { color: #e53935; }
+    .faq-question i { transition: transform 0.3s; color: #e53935; }
+    .faq-item.active .faq-question i { transform: rotate(180deg); }
+    .faq-answer {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+      padding: 0 24px; background: #fafafa; color: #666; font-size: 14px; line-height: 1.7;
+    }
+    .faq-item.active .faq-answer { max-height: 200px; padding: 0 24px 20px; }
+
+    /* CONTACT */
+    #contato { background: #fafafa; }
+    .contact-container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; max-width: 1000px; margin: 0 auto; }
+    .contact-info { display: flex; flex-direction: column; gap: 24px; }
+    .contact-item { display: flex; align-items: flex-start; gap: 16px; transition: 0.3s; }
+    .contact-item:hover { transform: translateX(6px); }
+    .contact-item .icon {
+      width: 50px; height: 50px; background: rgba(229,57,53,0.08);
+      border-radius: 14px; display: flex; align-items: center; justify-content: center;
+      color: #e53935; font-size: 20px; flex-shrink: 0; transition: 0.3s;
+    }
+    .contact-item:hover .icon { background: #e53935; color: white; }
+    .contact-item h4 { font-size: 16px; margin-bottom: 4px; }
+    .contact-item p { color: #666; font-size: 14px; }
+    .contact-form { display: flex; flex-direction: column; gap: 16px; }
+    .contact-form input, .contact-form textarea {
+      padding: 14px 18px; border: 2px solid #eee; border-radius: 12px;
+      font-family: 'Inter', sans-serif; font-size: 15px; transition: 0.3s; outline: none;
+      background: white;
+    }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: #e53935; box-shadow: 0 0 0 3px rgba(229,57,53,0.08); }
+    .contact-form textarea { height: 140px; resize: none; }
+    .btn-send {
+      background: linear-gradient(135deg, #e53935, #c62828); color: white;
+      padding: 14px 30px; border: none; border-radius: 12px; font-size: 16px;
+      font-weight: 600; cursor: pointer; transition: 0.3s; font-family: 'Inter', sans-serif;
+      position: relative; overflow: hidden;
+    }
+    .btn-send:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(229,57,53,0.3); }
+    .btn-send .ripple {
+      position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3);
+      transform: scale(0); animation: ripple 0.6s linear;
+    }
+    @keyframes ripple { to { transform: scale(4); opacity: 0; } }
+
+    /* CTA BANNER */
+    .cta-banner {
+      background: linear-gradient(135deg, #e53935, #ff6f60);
+      padding: 80px 50px; text-align: center; color: white; position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: ""; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-content { position: relative; max-width: 600px; margin: 0 auto; }
+    .cta-content h2 { font-family: 'Playfair Display', serif; font-size: 36px; margin-bottom: 16px; }
+    .cta-content p { font-size: 18px; opacity: 0.9; margin-bottom: 30px; }
+    .btn-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: white; color: #e53935; padding: 16px 36px; border-radius: 14px;
+      text-decoration: none; font-weight: 700; font-size: 16px; transition: 0.3s;
+    }
+    .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
+
+    /* FOOTER */
+    footer {
+      background: #1a1a2e; color: white; padding: 60px 50px 30px; text-align: center;
+    }
+    .footer-content { max-width: 1100px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; text-align: left; margin-bottom: 40px; }
+    .footer-col h4 { font-size: 16px; margin-bottom: 16px; position: relative; }
+    .footer-col h4::after { content: ""; display: block; width: 30px; height: 2px; background: #e53935; margin-top: 8px; }
+    .footer-col p { color: rgba(255,255,255,0.5); font-size: 14px; line-height: 1.7; }
+    .footer-col a { display: block; color: rgba(255,255,255,0.5); text-decoration: none; font-size: 14px; margin-bottom: 10px; transition: 0.3s; }
+    .footer-col a:hover { color: white; padding-left: 4px; }
+    .footer-social { display: flex; gap: 12px; margin-top: 16px; }
+    .footer-social a {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(255,255,255,0.06); display: flex; align-items: center;
+      justify-content: center; color: rgba(255,255,255,0.6); text-decoration: none; transition: 0.3s;
+    }
+    .footer-social a:hover { background: #e53935; color: white; transform: translateY(-3px); }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.06); padding-top: 20px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+    }
+    .footer-bottom p { color: rgba(255,255,255,0.35); font-size: 13px; }
+    .footer-bottom-links a { color: rgba(255,255,255,0.35); text-decoration: none; margin-left: 20px; font-size: 13px; transition: 0.3s; }
+    .footer-bottom-links a:hover { color: white; }
+
+    /* SCROLL TO TOP */
+    .scroll-top {
+      position: fixed; bottom: 30px; right: 30px; width: 48px; height: 48px;
+      background: #e53935; color: white; border: none; border-radius: 14px;
+      cursor: pointer; font-size: 18px; box-shadow: 0 6px 20px rgba(229,57,53,0.3);
+      transition: 0.3s; opacity: 0; visibility: hidden; z-index: 999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .scroll-top.visible { opacity: 1; visibility: visible; }
+    .scroll-top:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(229,57,53,0.4); }
+
+    /* ANIMATIONS */
+    .fade-up { opacity: 0; transform: translateY(40px); transition: all 0.8s ease; }
+    .fade-up.show { opacity: 1; transform: translateY(0); }
+    .fade-left { opacity: 0; transform: translateX(-40px); transition: all 0.8s ease; }
+    .fade-left.show { opacity: 1; transform: translateX(0); }
+    .fade-right { opacity: 0; transform: translateX(40px); transition: all 0.8s ease; }
+    .fade-right.show { opacity: 1; transform: translateX(0); }
+    .scale-in { opacity: 0; transform: scale(0.8); transition: all 0.6s ease; }
+    .scale-in.show { opacity: 1; transform: scale(1); }
+    @keyframes heroFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .hero-content { animation: heroFade 1s ease 0.3s both; }
+    .hero-stats { animation: heroFade 1s ease 0.8s both; }
+
+    /* TOOLTIP */
+    [data-tooltip] { position: relative; cursor: pointer; }
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip); position: absolute; bottom: 120%; left: 50%;
+      transform: translateX(-50%); background: #1a1a2e; color: white;
+      padding: 6px 14px; border-radius: 8px; font-size: 12px; white-space: nowrap;
+      animation: tooltipIn 0.2s ease;
+    }
+    @keyframes tooltipIn { from { opacity: 0; transform: translateX(-50%) translateY(4px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 1024px) {
+      .services-grid, .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .progress-grid { grid-template-columns: repeat(2, 1fr); }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 768px) {
+      header { padding: 15px 20px; }
+      nav { position: absolute; top: 70px; right: 20px; background: white; width: 240px; border-radius: 16px; padding: 20px; flex-direction: column; display: none; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+      nav.active { display: flex; }
+      nav a { color: #333 !important; }
+      .menu-toggle { display: block; }
+      .hero h1 { font-size: 34px; }
+      .hero p { font-size: 16px; }
+      .hero-stats { gap: 20px; }
+      .hero-stats .stat h2 { font-size: 24px; }
+      section { padding: 60px 20px; }
+      .about-grid, .contact-container { grid-template-columns: 1fr; }
+      .services-grid, .team-grid { grid-template-columns: 1fr; }
+      .progress-grid { grid-template-columns: 1fr 1fr; }
+      .timeline::before { left: 20px; }
+      .timeline-item, .timeline-item:nth-child(odd) { flex-direction: row; padding-left: 50px; }
+      .timeline-content { width: 100%; }
+      .timeline-dot { left: 20px; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { justify-content: center; text-align: center; }
+      .btn-login { display: none; }
+      .typing-cursor { height: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PRÉ-CARREGADOR -->
+<div class="preloader" id="preloader">
+  <div class="preloader-inner">
+    <div class="preloader-logo"> <i class="fas fa-graduation-cap"></i></div>
+    <div class="preloader-bar"></div>
+  </div>
+</div>
+
+<!-- CABEÇALHO -->
+<header id="header" class="transparent">
+  <a href="/" class="logo"> <img
+  src= "https://github.com/rickypablo2005/meu-site-assets/blob/main/logo.png?raw=true"
+  style="
+    width:34px;
+    height:34px;
+    object-fit:contain;
+  "
+>CESFA</a>
+  <nav id="menu">
+    <a href="#inicio" class="nav-link active">Inicío</a>
+    <a href="#sobre" class="nav-link">Sobre</a>
+    <a href="#servicos" class="nav-link">Serviços</a>
+    <a href="#equipe" class="nav-link">Equipe</a>
+    <a href="#contato" class="nav-link">Contato</a>
+  </nav>
+  <a href="/login" class="btn-login"><i class="fas fa-sign-in-alt"></i> Portal</a>
+  <button class="menu-toggle" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-bg">
+    <div class="hero-particles" id="particles"></div>
+  </div>
+  <div class="hero-content">
+    <div class="badge"><i class="fas fa-map-marker-alt"></i> Centro Educacional em Caxias (MA) desde 2008</div>
+    <h1 id="heroTitle"></h1>
+    <p>O CESFA promove o desenvolvimento integral de crianças, adolescentes e mulheres, construindo um futuro mais justo e esperançoso para toda a comunidade.</p>
+    <div class="hero-buttons">
+      <a href="#sobre" class="btn-hero btn-primary"><i class="fas fa-arrow-right"></i> Conheça o CESFA</a>
+      <a href="#servicos" class="btn-hero btn-outline"><i class="fas fa-play-circle"></i> Nossos serviços</a>
+    </div>
+  </div>
+  <a href="#sobre" class="scroll-indicator"><i class="fas fa-chevron-down fa-2x"></i></a>
+  <div class="hero-stats">
+    <div class="stat"><h2 data-count="2008">0</h2><p>Fundado</p></div>
+    <div class="stat"><h2 data-count="3">0</h2><p>Turnos</p></div>
+    <div class="stat"><h2 data-count="100" data-suffix="+">0</h2><p>Alunos</p></div>
+    <div class="stat"><h2 data-count="15" data-suffix="+">0</h2><p>Educadores</p></div>
+  </div>
+</section>
+
+<!-- SOBRE -->
+<section id="sobre">
+  <div class="section-title fade-up">
+    <h2>Sobre o CESFA</h2>
+    <p>Conheça nossa missão e valores que guiam nosso trabalho educacional</p>
+    <div class="line"></div>
+  </div>
+  <div class="about-image fade-left">
+
+  <img
+    src="https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=1200&auto=format&fit=crop"
+    alt="Escola CESFA"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+</div>
+    <div class="about-text fade-right">
+      <h3>Educação que transforma vidas</h3>
+      <p>O Centro Educacional Santo Francisco de Assis (CESFA) atua desde 2008 em Caxias, Maranhão, oferecendo educação de qualidade e apoio integral para crianças e adolescentes.</p>
+      <p>Nossa missão e promover o desenvolvimento humano por meio da educação, cultura e assistência social, contribuindo para a construção de uma sociedade mais justa.</p>
+      <div class="about-features">
+        <div class="feature-item" data-tooltip="Metodologia atualizada"><i class="fas fa-book-open"></i><span>Ensino de qualidade</span></div>
+        <div class="feature-item" data-tooltip="Para todos"><i class="fas fa-users"></i><span>Inclusão social</span></div>
+        <div class="feature-item" data-tooltip="Ambiente seguro"><i class="fas fa-heart"></i><span>Acolhimento</span></div>
+        <div class="feature-item" data-tooltip="Etica e respeito"><i class="fas fa-star"></i><span>Valores humanos</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NUMEROS / PROGRESS -->
+<div class="progress-section">
+  <div class="progress-grid">
+    <div class="progress-item scale-in">
+      <div class="progress-circle" data-percent="95">
+        <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle class="fg" cx="60" cy="60" r="54"/></svg>
+        <span class="progress-number" data-count="95" data-suffix="%">0%</span>
+      </div>
+      <div class="progress-label">Aprovação</div>
+    </div>
+    <div class="progress-item scale-in">
+      <div class="progress-circle" data-percent="92">
+        <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle class="fg" cx="60" cy="60" r="54"/></svg>
+        <span class="progress-number" data-count="92" data-suffix="%">0%</span>
+      </div>
+      <div class="progress-label">Frequência</div>
+    </div>
+    <div class="progress-item scale-in">
+      <div class="progress-circle" data-percent="88">
+        <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle class="fg" cx="60" cy="60" r="54"/></svg>
+        <span class="progress-number" data-count="30" data-suffix="+">0</span>
+      </div>
+      <div class="progress-label">Alunos Ativos</div>
+    </div>
+    <div class="progress-item scale-in">
+      <div class="progress-circle" data-percent="100">
+        <svg viewBox="0 0 120 120"><circle class="bg" cx="60" cy="60" r="54"/><circle class="fg" cx="60" cy="60" r="54"/></svg>
+        <span class="progress-number" data-count="5">0</span>
+      </div>
+      <div class="progress-label">Disciplinas</div>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICOS -->
+<section id="servicos" style="background: #fafafa;">
+  <div class="section-title fade-up">
+    <h2>Nossos Serviços</h2>
+    <p>Oferecemos programas educacionais completos para o desenvolvimento integral</p>
+    <div class="line"></div>
+</div>
+  </div>
+  <div class="services-grid">
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #e53935, #ff6f60);"><i class="fas fa-chalkboard-teacher"></i></div>
+      <h3>Reforço Escolar</h3>
+      <p>Aulas de reforço em todas as materias com professores qualificados e atenciosos.</p>
+      <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/736x/6e/38/b7/6e38b7c7e39db50d3cc50c99dbbca205.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #1e88e5, #42a5f5);"><i class="fas fa-laptop-code"></i></div>
+      <h3>Informática</h3>
+      <p>Cursos de informática básica e avançada preparando para o mercado digital.</p>
+         <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/736x/08/50/4c/08504cab7130c2bbe129a1ed0382c00f.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #43a047, #66bb6a);"><i class="fas fa-futbol"></i></div>
+      <h3>Esportes</h3>
+      <p>Atividades esportivas para promover saúde, disciplina e trabalho em equipe.</p>
+       <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/1200x/de/51/55/de5155ac14d9618721e09deb286fed8d.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #8e24aa, #ab47bc);"><i class="fas fa-palette"></i></div>
+      <h3>Artes e Cultura</h3>
+      <p>Oficinas de artes, música e dança para estimular a criatividade.</p>
+       <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/1200x/1c/f5/dd/1cf5dd0fdd89bc005a5a13c8032a8ce1.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #ff8f00, #ffb300);"><i class="fas fa-hands-helping"></i></div>
+      <h3>Assistência Social</h3>
+      <p>Apoio as familias com orientação e acompanhamento social continuo.</p>
+       <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/736x/d4/7d/89/d47d89f5aff3ad205e8d6db97aa879cc.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+    </div>
+    <div class="service-card fade-up">
+      <div class="service-icon" style="background: linear-gradient(135deg, #00897b, #26a69a);"><i class="fas fa-seedling"></i></div>
+      <h3>Meio Ambiente</h3>
+      <p>Projetos de educação ambiental e sustentabilidade para a comunidade.</p>
+       <div
+  style="
+    width:100%;
+    height:220px;
+    border-radius:18px;
+    overflow:hidden;
+    margin-bottom:20px;
+  "
+>
+
+  <img
+    src="https://i.pinimg.com/736x/f0/2c/e4/f02ce4763b84c80886b604933a90b8ab.jpg"
+    style="
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    "
+  >
+
+</div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE -->
+<section class="timeline-section">
+  <div class="section-title fade-up">
+    <h2>Nossa História</h2>
+    <p>Uma trajetória de dedicação à educação e à comunidade</p>
+    <div class="line"></div>
+  </div>
+  <div class="timeline">
+    <div class="timeline-item fade-up">
+      <div class="timeline-content timeline-bg-2008">
+        <div class="timeline-year"><i class="fas fa-calendar"></i> 2008</div>
+        <h3>Fundação do CESFA</h3>
+        <p>Inicio das atividades educacionais em Caxias, Maranhão, com o objetivo de transformar a realidade local.</p>
+      </div>
+      <div class="timeline-dot"></div>
+    </div>
+    <div class="timeline-item fade-up">
+      <div class="timeline-content timeline-bg-2012">
+        <div class="timeline-year"><i class="fas fa-calendar"></i> 2012</div>
+        <h3>Expansão dos Programas</h3>
+        <p>Ampliação para três turnos de atendimento e inclusão de programas de informática e esportes.</p>
+      </div>
+      <div class="timeline-dot"></div>
+    </div>
+    <div class="timeline-item fade-up">
+      <div class="timeline-content timeline-bg-2018">
+        <div class="timeline-year"><i class="fas fa-calendar"></i> 2018</div>
+        <h3>Marco de 100 Alunos</h3>
+        <p>Atingimos a marca de 100 alunos atendidos simultaneamente, consolidando nosso impacto social.</p>
+      </div>
+      <div class="timeline-dot"></div>
+    </div>
+    <div class="timeline-item fade-up">
+      <div class="timeline-content timeline-bg-2024">
+        <div class="timeline-year"><i class="fas fa-calendar"></i> 2024</div>
+        <h3>Sistema Digital</h3>
+        <p>Lançamento do sistema educacional digital para gestão de alunos, notas e boletins.</p>
+      </div>
+      <div class="timeline-dot"></div>
+    </div>
+  </div>
+</section>
+
+<!-- DEPOIMENTOS -->
+<section class="testimonials-section">
+  <div class="section-title fade-up">
+    <h2>Depoimentos</h2>
+    <p>O que dizem sobre o CESFA</p>
+    <div class="line"></div>
+  </div>
+  <div class="testimonial-slider fade-up">
+    <div class="testimonial-track" id="testimonialTrack">
+      <div class="testimonial-card">
+        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <blockquote>O CESFA mudou a vida do meu filho. Ele melhorou muito na escola e aprendeu valores que leva para toda a vida. Sou eternamente grata.</blockquote>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: linear-gradient(135deg, #e53935, #ff6f60);">M</div>
+          <div class="testimonial-name"><h4>Maria Aparecida</h4><p>Mãe de aluno</p></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <blockquote>Trabalhar no CESFA é uma experiência incrível. Ver a evolução dos alunos e saber que fazemos a diferença motiva a gente todos os dias.</blockquote>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: linear-gradient(135deg, #1e88e5, #42a5f5);">P</div>
+          <div class="testimonial-name"><h4>Prof. Paulo Roberto</h4><p>Professor de Matemática</p></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <blockquote>O reforço escolar me ajudou demais! Passei de ano com notas ótimas e agora adoro estudar. Os professores são muito legais e pacientes.</blockquote>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background: linear-gradient(135deg, #43a047, #66bb6a);">L</div>
+          <div class="testimonial-name"><h4>Lucas, 14 anos</h4><p>Aluno do 9° ano</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="slider-controls">
+      <button class="slider-btn" onclick="moveSlider(-1)"><i class="fas fa-chevron-left"></i></button>
+      <button class="slider-btn" onclick="moveSlider(1)"><i class="fas fa-chevron-right"></i></button>
+    </div>
+    <div class="slider-dots" id="sliderDots"></div>
+  </div>
+</section>
+
+<!-- EQUIPE -->
+<section id="equipe">
+  <div class="section-title fade-up">
+    <h2>Nossa Equipe</h2>
+    <p>Profissionais dedicados a educação e ao desenvolvimento da comunidade</p>
+    <div class="line"></div>
+  </div>
+  <div class="team-grid">
+    <div class="team-card fade-up">
+      <div class="team-avatar" style="background: linear-gradient(135deg, #e53935, #ff6f60);">
+
+
+        <img
+  src="https://rededamas.com.br/admin/wp-content/uploads/2021/12/JOANNA-1.png"
+  alt="Diretora"
+  style="
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  "
+>
+        <div class="team-overlay">
+          <a href="#" class="team-social"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="team-social"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+      <div class="team-info"><h3>Joanna Biavatti</h3><p>Diretora Geral</p></div>
+    </div>
+    <div class="team-card fade-up">
+      <div class="team-avatar" style="background: linear-gradient(135deg, #1e88e5, #42a5f5);">
+        <img
+
+  src="https://scontent-for2-2.xx.fbcdn.net/v/t39.30808-6/261383146_132984462451904_7216890557020103722_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=U0m5uweLxtgQ7kNvwHeFDaY&_nc_oc=AdpTn0Je7R7zEBDYbsK9c-dtwJa5demqJOy68aVUD-B_L9DRhiedcEHiwgtMkGhcDQ5Hxj8vA6pq5OBWG6YoK3Pw&_nc_zt=23&_nc_ht=scontent-for2-2.xx&_nc_gid=viHtiokKU7m0A8JqSLELSQ&_nc_ss=7b2a8&oh=00_Af4VWKXBwI4KSutBuAGdSSXBHI32b1mNltpZ3TObv3Ookw&oe=6A07E7EE"
+  alt="Diretora"
+  style="
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  "
+>
+        <div class="team-overlay">
+          <a href="#" class="team-social"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="team-social"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+      <div class="team-info"><h3>Prf. Paulo David</h3><p>Coordenador</p></div>
+    </div>
+    <div class="team-card fade-up">
+      <div class="team-avatar" style="background: linear-gradient(135deg, #43a047, #66bb6a);">
+        <img
+  src="https://i.pinimg.com/736x/66/c5/b2/66c5b23a0cafbf780261faf303c3387c.jpg"
+  alt="Coordenador"
+  style="
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  "
+>
+        <div class="team-overlay">
+          <a href="#" class="team-social"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="team-social"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+      <div class="team-info"><h3>Jaqueline Gaspar Da Silva </h3><p>Pedagoga</p></div>
+    </div>
+    <div class="team-card fade-up">
+      <div class="team-avatar" style="background: linear-gradient(135deg, #8e24aa, #ab47bc);">
+        <img
+  src="https://i0.wp.com/diocesedecaxiasdomaranhao.org/wp-content/uploads/2018/06/28277139_1665327376838866_6786126889454444932_n.jpg?resize=300%2C208&ssl=1"
+  alt="Pedagoga"
+  style="
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  "
+>
+        <div class="team-overlay">
+          <a href="#" class="team-social"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#" class="team-social"><i class="fas fa-envelope"></i></a>
+        </div>
+      </div>
+      <div class="team-info"><h3>Dom Sebastião Lima Duarte</h3><p>Bispo Diocesano</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq-section" style="background: #fafafa;">
+  <div class="section-title fade-up">
+    <h2>Perguntas Frequentes</h2>
+    <p>Tire suas dúvidas sobre o CESFA</p>
+    <div class="line"></div>
+  </div>
+  <div class="faq-container">
+    <div class="faq-item fade-up" onclick="toggleFaq(this)">
+      <div class="faq-question">Como faço para matricular meu filho? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">A matricula pode ser feita presencialmente na sede do CESFA em Caxias, MA. Basta levar os documentos do responsável e da criança (RG, CPF, comprovante de residência e histórico escolar).</div>
+    </div>
+    <div class="faq-item fade-up" onclick="toggleFaq(this)">
+      <div class="faq-question">Quais as idades atendidas? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Atendemos crianças e adolescentes de 6 a 17 anos, com turmas organizadas por faixa etária e nível escolar para melhor aproveitamento.</div>
+    </div>
+    <div class="faq-item fade-up" onclick="toggleFaq(this)">
+      <div class="faq-question">O CESFA cobra mensalidade? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Não! Todos os servicos do CESFA são gratuitos. Somos uma instituição social que se mantêm por meio de doações e parcerias.</div>
+    </div>
+    <div class="faq-item fade-up" onclick="toggleFaq(this)">
+      <div class="faq-question">Como posso contribuir com o CESFA? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Voçê pode contribuir como voluntário, fazendo doações financeiras ou de materiais, ou estabelecendo parcerias. Entre em contato conosco para saber mais!</div>
+    </div>
+    <div class="faq-item fade-up" onclick="toggleFaq(this)">
+      <div class="faq-question">Quais horários de funcionamento? <i class="fas fa-chevron-down"></i></div>
+      <div class="faq-answer">Funcionamos de segunda a sexta-feira, das 7h as 17h, com três turnos: manhã (7h-11h), tarde (13h-17h) e integral para casos especiais.</div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<div class="cta-banner">
+  <div class="cta-content fade-up">
+    <h2>Faça parte dessa transformação</h2>
+    <p>Junte-se a nós, e contribua para um futuro melhor para crianças, e jovens de Caxias</p>
+    <a href="#contato" class="btn-cta"><i class="fas fa-heart"></i> Quero Ajudar</a>
+  </div>
+</div>
+
+<!-- CONTATO -->
+<section id="contato" style="background: #fafafa;">
+  <div class="section-title fade-up">
+    <h2>Entre em Contato</h2>
+    <p>Estamos sempre prontos para atender voce</p>
+    <div class="line"></div>
+  </div>
+  <div class="contact-container">
+    <div class="contact-info fade-left">
+      <div class="contact-item">
+        <div class="icon"><i class="fas fa-map-marker-alt"></i></div>
+        <div><h4>Endereço</h4><p>Caxias, Maranhao - Brasil</p></div>
+      </div>
+      <div class="contact-item">
+        <div class="icon"><i class="fas fa-phone"></i></div>
+        <div><h4>Telefone</h4><p>(99) 3521-0000</p></div>
+      </div>
+      <div class="contact-item">
+        <div class="icon"><i class="fas fa-envelope"></i></div>
+        <div><h4>Email</h4><p>contato@cesfa.org.br</p></div>
+      </div>
+      <div class="contact-item">
+        <div class="icon"><i class="fas fa-clock"></i></div>
+        <div><h4>Horário</h4><p>Seg - Sex: 7h as 17h</p></div>
+      </div>
+      <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 14px; box-shadow: 0 2px 10px rgba(0,0,0,0.04);">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31588.0!2d-43.35!3d-4.86!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x78c1e42c073b3f3%3A0x1234567890!2sCaxias%2C%20MA!5e0!3m2!1spt-BR!2sbr!4v1" width="100%" height="200" style="border:0; border-radius: 10px;" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+    <form class="contact-form fade-right" id="contactForm" onsubmit="submitContact(event)">
+      <input type="text" id="contactName" placeholder="Seu nome" required>
+      <input type="email" id="contactEmail" placeholder="Seu email" required>
+      <input type="text" id="contactSubject" placeholder="Assunto">
+      <textarea id="contactMsg" placeholder="Sua mensagem" required></textarea>
+      <button type="submit" class="btn-send" id="btnSend"><i class="fas fa-paper-plane"></i> Enviar Mensagem</button>
+      <div id="formSuccess" style="display:none; background: #ecfdf5; color: #059669; padding: 14px; border-radius: 10px; text-align: center; font-weight: 500;"><i class="fas fa-check-circle"></i> Mensagem enviada com sucesso!</div>
+    </form>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-content">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div style="font-size: 22px; font-weight: 700; margin-bottom: 12px;"><i class="fas fa-graduation-cap" style="color: #e53935;"></i> CESFA</div>
+        <p>Centro Educacional Santo Francisco de Assis. Transformando realidades por meio da educação desde 2008.</p>
+        <div class="footer-social">
+          <a href="#" data-tooltip="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" data-tooltip="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" data-tooltip="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="#" data-tooltip="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Links</h4>
+        <a href="#inicio">Início</a>
+        <a href="#sobre">Sobre</a>
+        <a href="#servicos">Serviços</a>
+        <a href="#equipe">Equipe</a>
+      </div>
+      <div class="footer-col">
+        <h4>Serviços</h4>
+        <a href="#">Reforço Escolar</a>
+        <a href="#">Informática</a>
+        <a href="#">Esportes</a>
+        <a href="#">Artes e Cultura</a>
+      </div>
+      <div class="footer-col">
+        <h4>Contato</h4>
+        <a href="#"><i class="fas fa-map-marker-alt"></i> Caxias, MA</a>
+        <a href="#"><i class="fas fa-phone"></i> (99) 3521-0000</a>
+        <a href="#"><i class="fas fa-envelope"></i> contato@cesfa.org.br</a>
+        <a href="/login"><i class="fas fa-lock"></i> Portal do Professor</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>CESFA &copy; 2024. Todos os direitos reservados.</p>
+      <div class="footer-bottom-links">
+        <a href="#">Privacidade</a>
+        <a href="#">Termos</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- SCROLL TO TOP -->
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0})"><i class="fas fa-chevron-up"></i></button>
+
+<script>
+// Preloader
+window.addEventListener('load', () => {
+  setTimeout(() => document.getElementById('preloader').classList.add('hidden'), 800);
+});
+
+// Particles
+const particlesContainer = document.getElementById('particles');
+for (let i = 0; i < 40; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.left = Math.random() * 100 + '%';
+  p.style.width = p.style.height = (Math.random() * 4 + 2) + 'px';
+  p.style.animationDuration = (Math.random() * 15 + 10) + 's';
+  p.style.animationDelay = (Math.random() * 10) + 's';
+  particlesContainer.appendChild(p);
+}
+
+// Typing effect
+const phrases = [
+  'Transformando realidades por meio da <span>educacao</span>',
+  'Construindo futuros com <span>conhecimento</span>',
+  'Formando cidadaos para um mundo <span>melhor</span>'
+];
+let phraseIndex = 0;
+const heroTitle = document.getElementById('heroTitle');
+function showPhrase() {
+  heroTitle.innerHTML = phrases[phraseIndex] + '<span class="typing-cursor"></span>';
+  phraseIndex = (phraseIndex + 1) % phrases.length;
+}
+showPhrase();
+setInterval(showPhrase, 4000);
+
+// Counter animation
+function animateCounters() {
+  document.querySelectorAll('[data-count]').forEach(el => {
+    if (el.dataset.animated) return;
+    const rect = el.getBoundingClientRect();
+    if (rect.top > window.innerHeight) return;
+    el.dataset.animated = 'true';
+    const target = parseInt(el.dataset.count);
+    const suffix = el.dataset.suffix || '';
+    const duration = 2000;
+    const start = Date.now();
+    function update() {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(target * eased) + suffix;
+      if (progress < 1) requestAnimationFrame(update);
+    }
+    update();
+  });
+}
+
+// Progress circles
+function animateProgressCircles() {
+  document.querySelectorAll('.progress-circle').forEach(circle => {
+    if (circle.dataset.animated) return;
+    const rect = circle.getBoundingClientRect();
+    if (rect.top > window.innerHeight) return;
+    circle.dataset.animated = 'true';
+    const percent = parseInt(circle.dataset.percent);
+    const circumference = 2 * Math.PI * 54;
+    const fg = circle.querySelector('.fg');
+    fg.style.strokeDashoffset = circumference * (1 - percent / 100);
+  });
+}
+
+// Header scroll
+const header = document.getElementById('header');
+const scrollTop = document.getElementById('scrollTop');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 50) { header.classList.add('scrolled'); header.classList.remove('transparent'); }
+  else { header.classList.add('transparent'); header.classList.remove('scrolled'); }
+  scrollTop.classList.toggle('visible', window.scrollY > 400);
+  animateCounters();
+  animateProgressCircles();
+});
+
+// Mobile menu
+function toggleMenu() { document.getElementById('menu').classList.toggle('active'); }
+
+// Scroll animations
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('show'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-up, .fade-left, .fade-right, .scale-in').forEach(el => observer.observe(el));
+
+// Active link
+const sections = document.querySelectorAll('section');
+const links = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', () => {
+  let current = '';
+  sections.forEach(s => { if (scrollY >= s.offsetTop - 100) current = s.getAttribute('id'); });
+  links.forEach(l => {
+    l.classList.remove('active');
+    if (l.getAttribute('href') === '#' + current) l.classList.add('active');
+  });
+});
+
+// Testimonial slider
+let currentSlide = 0;
+const track = document.getElementById('testimonialTrack');
+const totalSlides = track.children.length;
+const dotsContainer = document.getElementById('sliderDots');
+for (let i = 0; i < totalSlides; i++) {
+  const dot = document.createElement('div');
+  dot.className = 'slider-dot' + (i === 0 ? ' active' : '');
+  dot.onclick = () => goToSlide(i);
+  dotsContainer.appendChild(dot);
+}
+function goToSlide(n) {
+  currentSlide = n;
+  track.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+  document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+}
+function moveSlider(dir) {
+  currentSlide = (currentSlide + dir + totalSlides) % totalSlides;
+  goToSlide(currentSlide);
+}
+setInterval(() => moveSlider(1), 5000);
+
+// FAQ
+function toggleFaq(item) {
+  const wasActive = item.classList.contains('active');
+  document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+  if (!wasActive) item.classList.add('active');
+}
+
+// Contact form with animation
+function submitContact(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSend');
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '<i class="fas fa-check"></i> Enviado!';
+    btn.style.background = '#059669';
+    document.getElementById('formSuccess').style.display = 'block';
+    document.getElementById('contactForm').reset();
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
+      btn.style.background = '';
+      btn.disabled = false;
+      document.getElementById('formSuccess').style.display = 'none';
+    }, 3000);
+  }, 1500);
+}
+
+// Ripple effect on buttons
+document.querySelectorAll('.btn-send, .btn-hero').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    const ripple = document.createElement('span');
+    ripple.className = 'ripple';
+    const rect = this.getBoundingClientRect();
+    ripple.style.width = ripple.style.height = Math.max(rect.width, rect.height) + 'px';
+    ripple.style.left = (e.clientX - rect.left - rect.width / 2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - rect.height / 2) + 'px';
+    this.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+  });
+});
+
+// Parallax on hero
+window.addEventListener('scroll', () => {
+  const hero = document.querySelector('.hero-content');
+  if (hero) hero.style.transform = 'translateY(' + (window.scrollY * 0.3) + 'px)';
+});
+
+// Trigger initial animations
+setTimeout(() => { animateCounters(); animateProgressCircles(); }, 1200);
+</script>
+</body>
+</html>
