@@ -1,3 +1,4 @@
+
 from pathlib import Path
 
 from sqlalchemy import create_engine
@@ -35,6 +36,7 @@ class Base(DeclarativeBase):
 
 
 # GET DB
+
 def get_db():
 
     db = SessionLocal()
